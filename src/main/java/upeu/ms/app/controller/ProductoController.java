@@ -6,9 +6,11 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import upeu.ms.app.entity.Producto;
 import upeu.ms.app.service.IProductoService;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/producto")
 public class ProductoController {
@@ -76,7 +79,8 @@ public class ProductoController {
 		try {
 			var created = service.registrar(ob);
 			return ResponseEntity.status(HttpStatus.CREATED).body(created);
-		} catch (Exception e) {
+		} catch (DataAccessException e) {
+			log.error("Error al registrar el producto", ob.toString(), e.getStackTrace());
 			return ResponseEntity.internalServerError().body("Exception while saving Products");
 		}
 	}
