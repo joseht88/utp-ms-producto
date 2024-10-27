@@ -1,0 +1,43 @@
+pipeline {
+	agent any
+	tools {
+	    maven 'MAVEN'
+	    nodejs 'NodeJS'
+	}
+	
+	stages {
+	    stage('Preparation') {
+    	   steps {
+   	      		git 'https://github.com/joseht88/ms-producto.git'
+   	       		echo 'Pulled from github successfully'
+   	    	}
+    	}
+    	//Compila el codigo en formato ejecutable
+	    stage('Compile the code to executable format'){
+            steps{
+                sh 'mvn clean compile'
+                echo 'Convirtió el código legible por humanos a legible por máquina'
+            }
+        }
+    	//Empaqueta el proyecto y lo dejará en taget/project-1.0-SNAPSHOT.jar
+    	stage('Build') {
+	       steps {
+			   sh 'mvn package -DskipTests'
+			   echo 'Packaging project'
+			}
+       	}
+		
+		stage('Preparar Node') {
+			steps {
+				sh "echo npm -v"
+			}
+		}
+
+		stage('Postman API Tests') {
+			steps {
+				sh "newman run 'Mi coleccion.postman_collection.json' -e 'MS-Producto-Env.postman_environment.json'"
+			}
+		}
+		
+	}
+}

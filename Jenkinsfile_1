@@ -1,0 +1,53 @@
+pipeline {
+	agent any
+	tools {
+	    maven 'MAVEN'
+	    nodejs 'NodeJS'
+	}
+	
+	stages {
+	    stage('Preparation') {
+    	   steps {
+   	      		git 'https://github.com/joseht88/ms-producto.git'
+   	       		echo 'Pulled from github successfully'
+   	    	}
+    	}
+    	//Compila el codigo en formato ejecutable
+	    stage('Compile the code to executable format'){
+            steps{
+                sh 'mvn clean compile'
+                echo 'Convirtió el código legible por humanos a legible por máquina'
+            }
+        }
+
+    	//Empaqueta el proyecto y lo dejará en taget/project-1.0-SNAPSHOT.jar
+    	stage('Build') {
+	       steps {
+			   sh 'mvn package -DskipTests'
+			   echo 'Packaging project'
+			}
+       	}
+		
+		stage('Install Postman CLI') {
+			steps {
+				sh 'sudo curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh'
+			}
+		}
+
+		stage('Postman CLI Login') {
+			environment {
+		        POSTMAN_API_KEY_TOKEN = credentials('POSTMAN_API_KEY')
+		    }
+			steps {
+				//sh "echo 'My token postman is $POSTMAN_API_KEY_TOKEN'"
+				sh 'postman login --with-api-key $POSTMAN_API_KEY_TOKEN'
+			}
+		}
+
+		stage('Running collection') {
+			steps {
+				sh 'postman collection run "9353983-8d7d5a24-1f67-4208-9695-9313f5c231a0"-e "9353983-e9145a7a-d1cf-4584-887b-2f9a1393e432"'
+			}
+		}
+	}
+}

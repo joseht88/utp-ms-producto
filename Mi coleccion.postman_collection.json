@@ -1,0 +1,200 @@
+{
+	"info": {
+		"_postman_id": "8d7d5a24-1f67-4208-9695-9313f5c231a0",
+		"name": "Mi coleccion",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "9353983"
+	},
+	"item": [
+		{
+			"name": "Registrar producto",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"let jsonData = pm.response.json();\r",
+							"if (jsonData) {\r",
+							"    var id = jsonData.id;\r",
+							"    pm.collectionVariables.set(\"id\", id );\r",
+							"} else {\r",
+							"    console.log('No se encontró el id');\r",
+							"}\r",
+							"\r",
+							"//si queremos que luego de ejecutar ese request pase a otro\r",
+							"//postman.setNextRequest(\"Listar producto\"); deprecate\r",
+							"//pm.execution.setNextRequest(\"Listar productos\");"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"//creamos una variable global para almacenar nosmbre aleatorios\r",
+							"pm.globals.set(\"nombreProducto\", pm.variables.replaceIn('{{$randomProduct}}') );\r",
+							"pm.globals.set(\"precio\", pm.variables.replaceIn('{{$randomPrice}}') );\r",
+							"pm.globals.set(\"fecha\", pm.variables.replaceIn('{{$isoTimestamp}}') );\r",
+							"pm.globals.set(\"estado\", pm.variables.replaceIn('{{$randomBoolean}}') );\r",
+							"pm.collectionVariables.set(\"fechaCol\", pm.variables.replaceIn('{{$isoTimestamp}}') );\r",
+							"console.log(pm.variables.get(\"fechaCol\"));"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nombre\": \"{{nombreProducto}}\",\r\n    \"precio\": {{precio}},\r\n    \"createAt\": \"{{fechaCol}}\",\r\n    \"estado\": {{estado}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/api/producto",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"api",
+						"producto"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Listar producto x id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Status code: Code is 200\r",
+							"pm.test(\"Mi primer prueba respues status code 200 ok\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    //si queremos comprobar si resuelve 2 tipos de codigo\r",
+							"    //pm.expect(pm.response.code).to.be.oneOf([201,202]);\r",
+							"});\r",
+							"//Response body: Contains string\r",
+							"pm.test(\"Respuesta de API contiene campo ID\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"id\");\r",
+							"});\r",
+							"//Response body: Contains string\r",
+							"pm.test(\"Respuesta de API contiene campo precio\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"precio\");\r",
+							"});\r",
+							"//Response headers: Content-Type header check\r",
+							"pm.test(\"Encabezado de respuesta contiene fecha\", function () {\r",
+							"    pm.response.to.have.header(\"Date\");\r",
+							"});\r",
+							"//Response body: JSON value check\r",
+							"pm.test(\"Validar el nombre\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.nombre).to.eql(\"Adidas\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validación con multiples assertions\", () => {\r",
+							"    //parse the response JSON and test three properties\r",
+							"    const responseJson = pm.response.json();\r",
+							"    // si el valor de la propiedad nombre sea Adidas\r",
+							"    pm.expect(responseJson.nombre).to.eql('Adidas');\r",
+							"    // si el valor de la propiedad nombre es una cadena\r",
+							"    pm.expect(responseJson.nombre).to.be.a('string');\r",
+							"    // si el valor de la propiedad nombre tiene 4 digitos\r",
+							"    pm.expect(responseJson.nombre).to.have.lengthOf(4);\r",
+							"    // su el valor de la propiedad nombre tienen alguna valor\r",
+							"    pm.expect(responseJson.nombre).to.contains(\"Soa\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/api/producto/{{id}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"api",
+						"producto",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Listar productos",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Mi primer prueba respues status code 200 ok\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"La respuesta de la API es menos que 85ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(85);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"La validación de la respuesta de un vector\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData[1].nombre).to.eql(\"Mouse\");\r",
+							"    //pm.expect(jsonData.productos[1].nombre).to.eql(\"Mouse\");\r",
+							"    console.log(jsonData[1].nombre);\r",
+							"});\r",
+							"\r",
+							"//pm.execution.setNextRequest(\"Listar producto x id\");"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/api/producto",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"api",
+						"producto"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "fechaCol",
+			"value": ""
+		},
+		{
+			"key": "id",
+			"value": ""
+		}
+	]
+}
