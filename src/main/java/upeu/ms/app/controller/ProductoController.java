@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import upeu.ms.app.entity.Producto;
 import upeu.ms.app.service.IProductoService;
 
+@Tag(name = "Productos", description = "Servicios que consume la aplicacion")
 @Slf4j
 @RestController
 @RequestMapping("/api/producto")
